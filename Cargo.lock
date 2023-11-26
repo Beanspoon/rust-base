@@ -3,5 +3,12 @@
 version = 3
 
 [[package]]
+name = "arm_core"
+version = "0.1.0"
+
+[[package]]
 name = "rust-base"
 version = "0.1.0"
+dependencies = [
+ "arm_core",
+]
