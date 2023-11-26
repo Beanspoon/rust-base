@@ -8,7 +8,6 @@ extern crate arm_core;
 entry!(main);
 
 fn main() -> ! {
-    let _x = 42;
 
     loop {}
 }

@@ -1,6 +1,6 @@
 #![no_std]
 
-use core::panic::PanicInfo;
+use core::{panic::PanicInfo, ptr, mem};
 
 #[macro_export]
 macro_rules! entry {
@@ -16,6 +16,28 @@ macro_rules! entry {
 
 #[no_mangle]
 pub unsafe extern "C" fn Reset() -> ! {
+    extern "C" {
+        static mut _sbss: usize;
+        static mut _ebss: usize;
+        static mut _sdata: usize;
+        static mut _edata: usize;
+        static mut _sidata: usize;
+    }
+
+    let mut p_bss: *mut usize = &mut _sbss;
+    while p_bss < &mut _ebss {
+        ptr::write_volatile(p_bss, mem::zeroed());
+        p_bss = p_bss.offset(1);
+    }
+
+    let mut p_data: *mut usize = &mut _sdata;
+    let mut p_sidata: *mut usize = &mut _sidata;
+    while p_data < &mut _edata {
+        ptr::write(p_data, ptr::read(p_sidata));
+        p_data = p_data.offset(1);
+        p_sidata = p_sidata.offset(1);
+    }
+
     extern "Rust" {
         fn main() -> !;
     }
