@@ -2,6 +2,18 @@
 
 use core::panic::PanicInfo;
 
+#[macro_export]
+macro_rules! entry {
+    ($path:path) => {
+        #[export_name = "main"]
+        pub unsafe fn __main() -> ! {
+            let f: fn() -> ! = $path;
+
+            f()
+        }
+    };
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn Reset() -> ! {
     extern "Rust" {
