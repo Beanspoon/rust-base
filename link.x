@@ -24,6 +24,21 @@ SECTIONS
         *(.text .text.*)
     } > FLASH
 
+    .rodata :
+    {
+        *(.rodata .rodata.*);
+    } > FLASH
+
+    .bss :
+    {
+        *(.bss .bss.*);
+    } > RAM
+
+    .data :
+    {
+        *(.data .data.*);
+    } > RAM
+
     /DISCARD/ :
     {
         *(.ARM.exidx .ARM.exidx.*)
