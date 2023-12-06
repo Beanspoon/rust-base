@@ -14,6 +14,11 @@ macro_rules! entry {
     };
 }
 
+pub union Vector {
+    reserved: u32,
+    handler: unsafe extern "C" fn(),
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn Reset() -> ! {
     extern "C" {
@@ -49,7 +54,42 @@ pub unsafe extern "C" fn Reset() -> ! {
 #[no_mangle]
 pub static RESET_VECTOR: unsafe extern "C" fn() -> ! = Reset;
 
+extern "C" {
+    fn nmi_handler();
+    fn hard_fault_handler();
+    fn memory_management_fault_handler();
+    fn bus_fault_handler();
+    fn usage_fault_handler();
+    fn sv_call_handler();
+    fn pending_sv_handler();
+    fn systick_handler();
+}
+
+#[link_section = ".vector_table.exceptions"]
+#[no_mangle]
+pub static EXCEPTIONS: [Vector; 14] = [
+    Vector { handler: nmi_handler },
+    Vector { handler: hard_fault_handler },
+    Vector { handler: memory_management_fault_handler },
+    Vector { handler: bus_fault_handler },
+    Vector { handler: usage_fault_handler },
+    Vector { reserved: 0 },
+    Vector { reserved: 0 },
+    Vector { reserved: 0 },
+    Vector { reserved: 0 },
+    Vector { handler: sv_call_handler },
+    Vector { reserved: 0 },
+    Vector { reserved: 0 },
+    Vector { handler: pending_sv_handler },
+    Vector { handler: systick_handler },
+];
+
 #[panic_handler]
 fn panic(_panic: &PanicInfo<'_>) -> ! {
+    loop {}
+}
+
+#[no_mangle]
+fn default_exception_handler() {
     loop {}
 }
